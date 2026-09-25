@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMBA - PLN Icon Plus</title>
+  
+  <!-- // 1. IMPORT GOOGLE FONT MONTSERRAT -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+  
+  <!-- // 2. IMPORT LIBRARY SUPABASE JS SDK (DATABASE CLOUD) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background-color: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 15px;
+    }
+
+    .login-card {
+      background: #ffffff;
+      padding: 24px 20px;
+      border-radius: 12px;
+      border: 2px solid #e53935;
+      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.15);
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      position: relative;
+    }
+
+    .header-img {
+      width: 100%;
+      max-width: 250px;
+      height: auto;
+      display: block;
+      margin: 0 auto 12px auto;
+    }
+
+    .welcome-text {
+      font-size: 13px;
+      color: #555;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .form-group {
+      text-align: left;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: bold;
+      color: #222222;
+      margin-bottom: 5px;
+    }
+
+    .form-label span {
+      color: #d93025;
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper .input-field {
+      padding-right: 35px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 15px;
+      opacity: 0.6;
+      transition: opacity 0.2s;
+    }
+
+    .toggle-password:hover {
+      opacity: 1;
+    }
+
+    .input-field, .select-field {
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid #cccccc;
+      border-radius: 6px;
+      font-size: 13px;
+      outline: none;
+      background-color: #ffffff;
+    }
+
+    .input-field:focus, .select-field:focus {
+      border-color: #00A859;
+      box-shadow: 0 0 4px rgba(0, 168, 89, 0.3);
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background-color: #00A859;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 5px;
+    }
+
+    .btn-submit:hover {
+      background-color: #008f4c;
+    }
+
+    .toggle-link {
+      margin-top: 15px;
+      font-size: 12px;
+      color: #0073e6;
+      cursor: pointer;
+      text-decoration: underline;
+      display: inline-block;
+    }
+
+    .toggle-link:hover {
+      color: #0059b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card">
+    <img src="https://cdn.phototourl.com/free/2026-09-08-329ce13d-6459-4e81-bd5a-7efbb17c5b5f.jpg" alt="SIMBA PLN Icon Plus" class="header-img">
+    <div class="welcome-text" id="formTitle">Silakan Login Terlebih Dahulu</div>
+
+    <!-- // ========================================== -->
+    <!-- // FORM 1: MASUK / LOGIN                      -->
+    <!-- // ========================================== -->
+    <form id="loginForm" onsubmit="prosesLogin(event)">
+      <div class="form-group">
+        <div class="form-label">Email Terdaftar: <span>*</span></div>
+        <input type="email" id="loginEmail" class="input-field" placeholder="contoh@gmail.com" required>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Password: <span>*</span></div>
+        <div class="password-wrapper">
+          <input type="password" id="loginPassword" class="input-field" placeholder="Masukkan Password..." required>
+          <span class="toggle-password" onclick="togglePassword('loginPassword', this)">👁️</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnLogin">MASUK</button>
+      <div>
+        <span class="toggle-link" onclick="pindahTampilan('register')">Belum punya akses? Minta Pendaftaran</span>
+      </div>
+    </form>
+
+
+    <!-- // ========================================== -->
+    <!-- // FORM 2: PENDAFTARAN / REGISTER             -->
+    <!-- // ========================================== -->
+    <form id="registerForm" style="display: none;" onsubmit="prosesRegister(event)">
+      <div class="form-group">
+        <div class="form-label">Nama Lengkap: <span>*</span></div>
+        <input type="text" id="regNama" class="input-field" placeholder="Masukkan Nama Lengkap..." required>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Email: <span>*</span></div>
+        <input type="email" id="regEmail" class="input-field" placeholder="contoh@gmail.com" required>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Role Akses: <span>*</span></div>
+        <select id="regRole" class="select-field" required>
+          <option value="PKL">PKL</option>
+          <option value="PEGAWAI">Pegawai</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Password: <span>*</span></div>
+        <div class="password-wrapper">
+          <input type="password" id="regPassword" class="input-field" placeholder="Buat Password Akun..." required>
+          <span class="toggle-password" onclick="togglePassword('regPassword', this)">👁️</span>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btnRegister">KIRIM PERMOHONAN</button>
+      <div>
+        <span class="toggle-link" onclick="pindahTampilan('login')">Sudah punya akun? Kembali ke Login</span>
+      </div>
+    </form>
+  </div>
+
+
+  <!-- // ========================================== -->
+  <!-- // JAVASCRIPT LOGIC (SUPABASE SQL DATABASE)  -->
+  <!-- // ========================================== -->
+  <script>
+    // // 1. INISIALISASI KONEKSI DATABASE SUPABASE
+    const SUPABASE_URL = "https://eaahqoaugbswnhqpcbul.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_5-DU9Coms_TkootEWNebIA_D1CrZaC9";
+    const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // // 2. FUNGSI UNTUK PINDAH TAMPILAN LOGIN / REGISTER
+    function pindahTampilan(tujuan) {
+      const loginForm = document.getElementById("loginForm");
+      const registerForm = document.getElementById("registerForm");
+      const formTitle = document.getElementById("formTitle");
+
+      if (tujuan === "register") {
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+        formTitle.innerText = "Form Permohonan Akses Akun Baru";
+      } else {
+        registerForm.style.display = "none";
+        loginForm.style.display = "block";
+        formTitle.innerText = "Silakan Login Terlebih Dahulu";
+      }
+    }
+
+    // // 3. FUNGSI UNTUK INTIP / SEMBUNYIKAN PASSWORD
+    function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === "password") {
+        input.type = "text";
+        icon.innerText = "🙈";
+      } else {
+        input.type = "password";
+        icon.innerText = "👁️";
+      }
+    }
+
+    // // 4. FUNGSI PROSES LOGIN USER
+    async function prosesLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value.trim();
+      const btn = document.getElementById("btnLogin");
+
+      btn.innerText = "Memeriksa...";
+      btn.disabled = true;
+
+      try {
+        // Cek User di Tabel SQL Supabase
+        const { data, error } = await db
+          .from("users")
+          .select("*")
+          .eq("email", email)
+          .eq("password", password)
+          .single();
+
+        if (error || !data) {
+          alert("❌ Email atau Password salah!");
+          btn.innerText = "MASUK";
+          btn.disabled = false;
+          return;
+        }
+
+        // Cek Status Persetujuan Admin
+        if (data.status === "pending") {
+          alert("⏳ Akun Anda masih menunggu persetujuan dari Admin!");
+          btn.innerText = "MASUK";
+          btn.disabled = false;
+          return;
+        }
+
+        if (data.status === "rejected") {
+          alert("❌ Permohonan akses akun Anda ditolak oleh Admin.");
+          btn.innerText = "MASUK";
+          btn.disabled = false;
+          return;
+        }
+
+        // Simpan Data Sesi Pengguna
+        sessionStorage.setItem("simba_access", "granted");
+        sessionStorage.setItem("simba_user", JSON.stringify({
+          nama: data.nama,
+          email: data.email,
+          role: data.role
+        }));
+
+        // Catat Log Akses LOGIN ke Database
+        await db.from("access_logs").insert([
+          { email: data.email, nama: data.nama, aktivitas: "LOGIN" }
+        ]);
+
+        alert(`Selamat datang kembali, ${data.nama}!`);
+        window.location.href = "dashboard.html";
+
+      } catch (err) {
+        alert("❌ KONEKSI ERROR: " + err.message);
+        btn.innerText = "MASUK";
+        btn.disabled = false;
+      }
+    }
+
+    // // 5. FUNGSI PROSES PENDAFTARAN AKUN BARU
+    async function prosesRegister(e) {
+      e.preventDefault();
+      const nama = document.getElementById("regNama").value.trim();
+      const email = document.getElementById("regEmail").value.trim().toLowerCase();
+      const role = document.getElementById("regRole").value;
+      const password = document.getElementById("regPassword").value.trim();
+      const btn = document.getElementById("btnRegister");
+
+      btn.innerText = "Mengirim...";
+      btn.disabled = true;
+
+      try {
+        // Masukkan Data Baru ke Tabel Users dengan Status 'pending'
+        const { data, error } = await db.from("users").insert([
+          {
+            nama: nama,
+            email: email,
+            role: role,
+            password: password,
+            status: "pending"
+          }
+        ]);
+
+        if (error) {
+          if (error.code === "23505") { // Kode error email duplikat di Postgres
+            alert("⚠️ Email ini sudah terdaftar sebelumnya!");
+          } else {
+            alert("❌ Gagal mendaftar: " + error.message);
+          }
+          btn.innerText = "KIRIM PERMOHONAN";
+          btn.disabled = false;
+          return;
+        }
+
+        alert("✅ Permohonan akses berhasil dikirim! Silakan hubungi Admin untuk melakukan persetujuan.");
+        document.getElementById("registerForm").reset();
+        pindahTampilan("login");
+
+      } catch (err) {
+        alert("❌ KONEKSI ERROR: " + err.message);
+      } finally {
+        btn.innerText = "KIRIM PERMOHONAN";
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

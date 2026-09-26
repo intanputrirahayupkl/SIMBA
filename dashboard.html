@@ -5,553 +5,247 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard SIMBA - PLN Icon Plus</title>
 
-  <!-- // 1. IMPORT GOOGLE FONTS -->
+  <!-- GOOGLE FONTS & ICONS -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
-  <!-- // 2. IMPORT LIBRARY CHART.JS & DATALABELS -->
+  <!-- LIBRARIES -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
-
-  <!-- // 3. IMPORT LIBRARY SUPABASE JS SDK (DATABASE CLOUD) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      width: 100%;
-      height: 100vh;
+      width: 100%; height: 100vh;
       overflow: hidden;
       font-family: Arial, Helvetica, sans-serif;
       background-color: #f8fafc;
       color: #1e293b;
-      display: flex;
-      flex-direction: column;
+      display: flex; flex-direction: column;
     }
 
     .top-header {
       background: #ffffff;
       border-bottom: 1px solid #e2e8f0;
       padding: 6px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      display: flex; align-items: center; justify-content: space-between;
       box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      height: 120px;
-      flex-shrink: 0;
+      height: 120px; flex-shrink: 0;
     }
 
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      flex: 1;
-    }
-
-    .header-left .logo-icon {
-      height: 80px;
-      width: auto;
-    }
+    .header-left { display: flex; align-items: center; gap: 15px; flex: 1; }
+    .header-left .logo-icon { height: 80px; width: auto; }
 
     .header-center {
-      text-align: center;
-      flex: 3;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      text-align: center; flex: 3;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
     }
-
-    .header-center .simba-banner {
-      height: 65px;
-      width: auto;
-      max-width: 100%;
-      object-fit: contain;
-    }
+    .header-center .simba-banner { height: 65px; width: auto; max-width: 100%; object-fit: contain; }
 
     .simba-subtitle {
       font-family: 'Montserrat', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #e11d48;
-      margin-top: 4px;
-      letter-spacing: 1.2px;
-      text-transform: uppercase;
+      font-size: 15px; font-weight: 700; color: #e11d48;
+      margin-top: 4px; letter-spacing: 1.2px; text-transform: uppercase;
     }
 
     .header-right {
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 12px;
-      flex: 1;
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 12px; flex: 1; position: relative;
     }
 
-    .user-profile-box {
-      text-align: right;
-      font-family: 'Montserrat', sans-serif;
+    .profile-trigger-btn {
+      display: flex; align-items: center; gap: 10px;
+      background: #f1f5f9; border: 1.5px solid #cbd5e1;
+      padding: 6px 14px; border-radius: 30px;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .profile-trigger-btn:hover { background: #e2e8f0; border-color: #0284c7; }
+
+    .profile-avatar-icon {
+      width: 36px; height: 36px; background: #0284c7; color: #ffffff;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
     }
 
-    .user-profile-name {
-      font-size: 13px;
-      font-weight: 800;
-      color: #0f172a;
-    }
-
+    .user-profile-box { text-align: left; font-family: 'Montserrat', sans-serif; }
+    .user-profile-name { font-size: 12px; font-weight: 800; color: #0f172a; }
     .user-profile-role {
-      font-size: 10px;
-      font-weight: 700;
-      background: #e0f2fe;
-      color: #0284c7;
-      padding: 2px 6px;
-      border-radius: 4px;
-      display: inline-block;
-      margin-top: 2px;
-      text-transform: uppercase;
+      font-size: 9px; font-weight: 800; background: #e0f2fe; color: #0284c7;
+      padding: 1px 5px; border-radius: 4px; display: inline-block; text-transform: uppercase;
     }
 
-    .btn-logout-red {
-      background-color: #e53935;
-      color: #ffffff;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      font-size: 12px;
-      border: none;
-      border-radius: 6px;
-      padding: 10px 18px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(229, 57, 53, 0.25);
-      transition: background 0.2s, transform 0.1s;
-      letter-spacing: 0.8px;
+    /* DROPDOWN PROFIL */
+    .profile-dropdown-menu {
+      position: absolute; top: 55px; right: 0;
+      width: 250px; background: #ffffff;
+      border: 1px solid #cbd5e1; border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      z-index: 1000; display: none; padding: 12px;
     }
+    .profile-dropdown-menu.show { display: block; }
 
-    .btn-logout-red:hover {
-      background-color: #d32f2f;
-      transform: translateY(-1px);
+    .dropdown-user-header {
+      padding-bottom: 10px; margin-bottom: 10px;
+      border-bottom: 1px solid #f1f5f9; font-family: 'Montserrat', sans-serif;
     }
+    .dropdown-user-name { font-size: 13px; font-weight: 800; color: #0f172a; }
+    .dropdown-user-email { font-size: 11px; color: #64748b; margin-top: 2px; word-break: break-all; }
+
+    .dropdown-menu-item {
+      display: flex; align-items: center; gap: 10px;
+      width: 100%; padding: 10px 12px; font-family: 'Montserrat', sans-serif;
+      font-size: 12px; font-weight: 700; color: #334155;
+      background: none; border: none; border-radius: 8px;
+      cursor: pointer; text-align: left; transition: background 0.2s;
+    }
+    .dropdown-menu-item:hover { background: #f1f5f9; color: #0284c7; }
+    .dropdown-menu-item.danger { color: #dc2626; }
+    .dropdown-menu-item.danger:hover { background: #fef2f2; }
+
+    .dropdown-divider { height: 1px; background: #f1f5f9; margin: 6px 0; }
 
     .container {
-      max-width: 99%;
-      width: 99%;
-      margin: 10px auto;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #ffffff;
-      border-radius: 12px;
-      border: 2px solid #e53935;
-      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.15);
-      overflow: hidden;
+      max-width: 99%; width: 99%; margin: 10px auto; flex: 1;
+      display: flex; flex-direction: column; background: #ffffff;
+      border-radius: 12px; border: 2px solid #e53935;
+      box-shadow: 0 6px 20px rgba(229, 57, 53, 0.15); overflow: hidden;
     }
 
     .modern-nav-wrapper {
-      background: #ffffff;
-      padding: 6px 16px;
-      border-bottom: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-shrink: 0;
+      background: #ffffff; padding: 6px 16px; border-bottom: 1px solid #e2e8f0;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0;
     }
 
-    .tab-group {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
+    .tab-group { display: flex; gap: 8px; align-items: center; }
 
     .tab-btn {
-      background: #f1f5f9;
-      color: #0284c7;
-      font-family: 'Montserrat', sans-serif;
-      border: 1px solid #cbd5e1;
-      padding: 8px 20px;
-      font-size: 13px;
-      font-weight: 700;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: inline-flex;
-      align-items: center;
-      white-space: nowrap;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
+      background: #f1f5f9; color: #0284c7; font-family: 'Montserrat', sans-serif;
+      border: 1px solid #cbd5e1; padding: 8px 20px; font-size: 13px; font-weight: 700;
+      border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
+      display: inline-flex; align-items: center; white-space: nowrap; letter-spacing: 0.8px; text-transform: uppercase;
     }
+    .tab-btn:hover { background: #e0f2fe; border-color: #38bdf8; }
+    .tab-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35); }
 
-    .tab-btn:hover {
-      background: #e0f2fe;
-      border-color: #38bdf8;
-    }
-
-    .tab-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
-    }
-
-    .right-nav-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .right-nav-group { display: flex; align-items: center; gap: 10px; }
 
     .tab-btn-green {
-      background: #ecfdf5;
-      color: #059669;
-      font-family: 'Montserrat', sans-serif;
-      border: 1.5px solid #10b981;
-      padding: 7px 18px;
-      font-size: 13px;
-      font-weight: 800;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.25s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
+      background: #ecfdf5; color: #059669; font-family: 'Montserrat', sans-serif;
+      border: 1.5px solid #10b981; padding: 7px 18px; font-size: 13px; font-weight: 800;
+      border-radius: 20px; cursor: pointer; transition: all 0.25s ease;
+      display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+      letter-spacing: 0.8px; text-transform: uppercase; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.15);
     }
+    .tab-btn-green:hover { background: #d1fae5; border-color: #059669; transform: translateY(-1px); }
+    .tab-btn-green.active { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff; border-color: #047857; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4); }
 
-    .tab-btn-green:hover {
-      background: #d1fae5;
-      border-color: #059669;
-      transform: translateY(-1px);
-    }
+    .sheet-wrapper { width: 100%; flex: 1; position: relative; background: #ffffff; overflow: hidden; }
 
-    .tab-btn-green.active {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
-      border-color: #047857;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-    }
+    .custom-view-container { width: 100%; height: 100%; padding: 24px; overflow-y: auto; background: #f8fafc; display: none; }
+    .dashboard-grid { display: flex; flex-direction: column; gap: 20px; max-width: 1200px; margin: 0 auto; padding-bottom: 30px; }
+    .dashboard-card { background: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+    .card-title { font-family: 'Montserrat', sans-serif; font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; letter-spacing: 0.5px; }
 
-    .tab-btn-admin {
-      background: #fef2f2;
-      color: #dc2626;
-      border: 1.5px solid #ef4444;
-    }
-
-    .tab-btn-admin:hover {
-      background: #fee2e2;
-      border-color: #dc2626;
-    }
-
-    .sheet-wrapper {
-      width: 100%;
-      flex: 1;
-      position: relative;
-      background: #ffffff;
-      overflow: hidden;
-    }
-
-    .custom-view-container {
-      width: 100%;
-      height: 100%;
-      padding: 24px;
-      overflow-y: auto;
-      background: #f8fafc;
-      display: none;
-    }
-
-    .dashboard-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding-bottom: 30px;
-    }
-
-    .dashboard-card {
-      background: #ffffff;
-      border-radius: 12px;
-      padding: 20px;
-      border: 1px solid #cbd5e1;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
-    }
-
-    .card-title {
-      font-family: 'Montserrat', sans-serif;
-      font-size: 16px;
-      font-weight: 800;
-      color: #0f172a;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      letter-spacing: 0.5px;
-    }
-
-    .top-section {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    .chart-box-doughnut {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 230px;
-      position: relative;
-    }
-
-    .stats-summary-box {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 14px;
-    }
-
-    .stat-item {
-      padding: 16px 20px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: 'Montserrat', sans-serif;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-    }
-
+    .top-section { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .chart-box-doughnut { display: flex; align-items: center; justify-content: center; height: 230px; position: relative; }
+    .stats-summary-box { display: flex; flex-direction: column; justify-content: center; gap: 14px; }
+    .stat-item { padding: 16px 20px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-family: 'Montserrat', sans-serif; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
     .stat-item.total { background: #f0f9ff; border: 1px solid #bae6fd; border-left: 6px solid #0284c7; }
     .stat-item.done { background: #ecfdf5; border: 1px solid #a7f3d0; border-left: 6px solid #10b981; }
     .stat-item.pending { background: #fffbebfb; border: 1px solid #fde68a; border-left: 6px solid #d97706; }
-
     .stat-label { font-size: 13px; font-weight: 800; color: #334155; }
     .stat-val.total-val { font-size: 22px; font-weight: 800; color: #0284c7; }
     .stat-val.done-val { font-size: 22px; font-weight: 800; color: #059669; }
     .stat-val.pending-val { font-size: 22px; font-weight: 800; color: #d97706; }
 
-    .line-section {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-    }
-
-    .year-nav {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .btn-year {
-      background: #e2e8f0;
-      border: none;
-      padding: 4px 12px;
-      border-radius: 6px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
+    .line-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+    .year-nav { display: flex; align-items: center; gap: 10px; }
+    .btn-year { background: #e2e8f0; border: none; padding: 4px 12px; border-radius: 6px; font-weight: 700; cursor: pointer; }
     .btn-year:hover { background: #cbd5e1; }
 
-    .monthly-list {
-      max-height: 240px;
-      overflow-y: auto;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .monthly-list { max-height: 240px; overflow-y: auto; font-size: 13px; display: flex; flex-direction: column; gap: 6px; }
+    .monthly-row { display: flex; justify-content: space-between; padding: 8px 12px; background: #f1f5f9; border-radius: 6px; font-family: 'Montserrat', sans-serif; font-weight: 600; }
 
-    .monthly-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: #f1f5f9;
-      border-radius: 6px;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 600;
-    }
+    .mitra-details { margin-top: 15px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-height: 180px; overflow-y: auto; }
+    .mitra-badge { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
 
-    .mitra-details {
-      margin-top: 15px;
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-
-    .mitra-badge {
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      font-weight: 700;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .submit-overlay-container {
-      position: absolute;
-      top: 138px;
-      right: 55px;
-      z-index: 5;
-      display: none;
-    }
-
+    .submit-overlay-container { position: absolute; top: 138px; right: 55px; z-index: 5; display: none; }
     .btn-submit-floating {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
-      font-family: 'Montserrat', sans-serif;
-      border: 2px solid #ffffff;
-      padding: 12px 36px;
-      font-size: 14px;
-      font-weight: 800;
-      border-radius: 10px;
-      cursor: pointer;
-      letter-spacing: 1.5px;
-      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-      transition: all 0.2s ease-in-out;
-      text-transform: uppercase;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: #ffffff;
+      font-family: 'Montserrat', sans-serif; border: 2px solid #ffffff;
+      padding: 12px 36px; font-size: 14px; font-weight: 800; border-radius: 10px;
+      cursor: pointer; letter-spacing: 1.5px; box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+      transition: all 0.2s ease-in-out; text-transform: uppercase;
     }
+    .btn-submit-floating:hover { background: linear-gradient(135deg, #059669 0%, #047857 100%); transform: translateY(-2px); }
 
-    .btn-submit-floating:hover {
-      background: linear-gradient(135deg, #059669 0%, #047857 100%);
-      transform: translateY(-2px);
-    }
-
-    .loading-overlay {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: #ffffff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 10;
-      transition: opacity 0.2s ease;
-    }
-
+    .loading-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #ffffff; display: flex; justify-content: center; align-items: center; z-index: 10; transition: opacity 0.2s ease; }
     .loading-overlay.hidden { display: none; }
-
-    .spinner {
-      width: 42px; height: 42px;
-      border: 4px solid #e2e8f0;
-      border-top: 4px solid #0284c7;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
+    .spinner { width: 42px; height: 42px; border: 4px solid #e2e8f0; border-top: 4px solid #0284c7; border-radius: 50%; animation: spin 0.8s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    .sheet-iframe { 
-      width: 100%; 
-      height: 100%; 
-      border: none; 
-      overscroll-behavior: contain; 
-      display: none; 
-    }
-    .sheet-iframe.active { 
-      display: block; 
-    }
+    .sheet-iframe { width: 100%; height: 100%; border: none; overscroll-behavior: contain; display: none; }
+    .sheet-iframe.active { display: block; }
 
+    /* MODAL STYLES */
     .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(15, 23, 42, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      display: none;
-      align-items: center;
-      justify-content: center;
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px);
+      z-index: 2000; display: none; align-items: center; justify-content: center;
     }
-
     .modal-overlay.show { display: flex; }
 
     .modal-card {
-      background: #ffffff;
-      padding: 24px 20px;
-      border-radius: 12px;
-      border: 2px solid #0284c7;
-      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.15);
-      width: 100%;
-      max-width: 650px;
-      text-align: left;
-      position: relative;
+      background: #ffffff; padding: 24px 20px; border-radius: 12px;
+      border: 2px solid #0284c7; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.15);
+      width: 100%; max-width: 650px; text-align: left; position: relative;
     }
 
     .modal-title-text {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-      font-size: 16px;
-      color: #0284c7;
-      margin-bottom: 16px;
-      text-transform: uppercase;
-      border-bottom: 2px solid #e2e8f0;
-      padding-bottom: 8px;
+      font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 16px;
+      color: #0284c7; margin-bottom: 16px; text-transform: uppercase;
+      border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;
     }
 
-    .admin-tab-nav {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-
+    .admin-tab-nav { display: flex; gap: 10px; margin-bottom: 15px; }
     .admin-tab-btn {
-      padding: 6px 14px;
-      font-family: 'Montserrat', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      cursor: pointer;
+      padding: 6px 14px; font-family: 'Montserrat', sans-serif; font-size: 12px;
+      font-weight: 700; background: #f1f5f9; border: 1px solid #cbd5e1;
+      border-radius: 6px; cursor: pointer;
     }
+    .admin-tab-btn.active { background: #0284c7; color: #ffffff; border-color: #0284c7; }
 
-    .admin-tab-btn.active {
-      background: #0284c7;
-      color: #ffffff;
-      border-color: #0284c7;
-    }
-
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-    }
-
-    .admin-table th, .admin-table td {
-      border: 1px solid #cbd5e1;
-      padding: 8px 10px;
-      text-align: left;
-    }
-
-    .admin-table th {
-      background: #f8fafc;
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 800;
-    }
+    .admin-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .admin-table th, .admin-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; }
+    .admin-table th { background: #f8fafc; font-family: 'Montserrat', sans-serif; font-weight: 800; }
 
     .btn-close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      background: none;
-      border: none;
-      font-size: 18px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #64748b;
+      position: absolute; top: 15px; right: 15px;
+      background: none; border: none; font-size: 18px;
+      cursor: pointer; font-weight: bold; color: #64748b;
     }
+
+    .btn-action-small {
+      border: none; padding: 4px 8px; border-radius: 4px;
+      cursor: pointer; font-family: 'Montserrat', sans-serif;
+      font-weight: 700; font-size: 11px; margin-right: 4px;
+    }
+    .btn-action-green { background: #10b981; color: white; }
+    .btn-action-blue { background: #0284c7; color: white; }
+    .btn-action-red { background: #e53935; color: white; }
+
+    .form-group-modal { margin-bottom: 14px; font-family: 'Montserrat', sans-serif; }
+    .form-group-modal label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; color: #334155; }
+    .form-group-modal input { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
   </style>
 </head>
 <body>
 
-  <!-- // HEADER DASHBOARD -->
+  <!-- HEADER DASHBOARD -->
   <header class="top-header">
     <div class="header-left">
       <img src="https://cdn.phototourl.com/free/2026-09-08-20213ab0-5a0a-492a-882c-ddcdab9020ab.jpg" alt="PLN Icon Plus" class="logo-icon">
@@ -563,15 +257,55 @@
     </div>
 
     <div class="header-right">
-      <div class="user-profile-box">
-        <div class="user-profile-name" id="userNamaDisplay">Pengguna</div>
-        <div class="user-profile-role" id="userRoleBadgeDisplay">GUEST</div>
+      <!-- TRIGGER PROFILE DROPDOWN -->
+      <div class="profile-trigger-btn" onclick="toggleProfileDropdown(event)">
+        <div class="profile-avatar-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="user-profile-box">
+          <div class="user-profile-name" id="userNamaDisplay">User</div>
+          <div class="user-profile-role" id="userRoleBadgeDisplay">GUEST</div>
+        </div>
+        <i class="fas fa-chevron-down" style="font-size: 10px; color: #64748b; margin-left: 4px;"></i>
       </div>
-      <button class="btn-logout-red" onclick="prosesLogout()">KELUAR</button>
+
+      <!-- DROPDOWN MENU PROFILE -->
+      <div class="profile-dropdown-menu" id="profileDropdownMenu">
+        <div class="dropdown-user-header">
+          <div class="dropdown-user-name" id="dropdownNamaDisplay">Nama User</div>
+          <div class="dropdown-user-email" id="dropdownEmailDisplay">email@domain.com</div>
+        </div>
+
+        <!-- Menu Khusus ADMIN -->
+        <div id="menuAdminOption" style="display: none;">
+          <button class="dropdown-menu-item" onclick="openAdminModal()">
+            <i class="fas fa-users-cog"></i> Panel Admin
+          </button>
+        </div>
+
+        <!-- Menu Ubah Password (SEMUA ROLE) -->
+        <button class="dropdown-menu-item" onclick="openPasswordModal()">
+          <i class="fas fa-key"></i> Ubah Password
+        </button>
+
+        <!-- Menu Khusus USER / PEGAWAI / PKL (Non-Admin) -->
+        <div id="menuUserOption" style="display: none;">
+          <button class="dropdown-menu-item danger" onclick="ajukanHapusAkun()">
+            <i class="fas fa-user-times"></i> Ajukan Hapus Akun
+          </button>
+        </div>
+
+        <div class="dropdown-divider"></div>
+
+        <!-- Tombol Keluar -->
+        <button class="dropdown-menu-item danger" onclick="prosesLogout()">
+          <i class="fas fa-sign-out-alt"></i> Keluar
+        </button>
+      </div>
     </div>
   </header>
 
-  <!-- // CONTAINER UTAMA -->
+  <!-- CONTAINER UTAMA -->
   <div class="container">
     <div class="modern-nav-wrapper">
       <div class="tab-group">
@@ -589,9 +323,6 @@
       <div class="right-nav-group">
         <button class="tab-btn-green" onclick="switchFolder('MONITORING', this)">
           <span>MONITORING BAPS</span>
-        </button>
-        <button class="tab-btn-green tab-btn-admin" id="btnKelolaAdmin" style="display: none;" onclick="openAdminModal()">
-          <span>KELOAL USER (ADMIN)</span>
         </button>
       </div>
     </div>
@@ -611,7 +342,7 @@
       
       <iframe id="frame-DATABASE" class="sheet-iframe" src="https://docs.google.com/spreadsheets/d/1OV3gPAjGBtXcxK3EsLVua-r8xQI-F9g1RVGJeJYLU9o/edit?rm=demo" loading="lazy" onload="hideLoading('DATABASE')"></iframe>
 
-      <!-- // GRAFIK MONITORING BAPS -->
+      <!-- GRAFIK MONITORING BAPS -->
       <div id="custom-monitoring-view" class="custom-view-container">
         <div class="dashboard-grid">
           <div class="top-section">
@@ -668,20 +399,17 @@
             </div>
             <div class="mitra-details" id="mitra-list-container"></div>
           </div>
-
         </div>
       </div>
     </div>
   </div>
 
 
-  <!-- // ========================================== -->
-  <!-- // MODAL PANEL ADMIN (APPROVAL, USER, LOG)  -->
-  <!-- // ========================================== -->
+  <!-- MODAL PANEL ADMIN -->
   <div id="modalAdmin" class="modal-overlay">
     <div class="modal-card">
       <button class="btn-close-modal" onclick="closeAdminModal()">✕</button>
-      <div class="modal-title-text">PANEL ADMIN & OTORISASI AKSES</div>
+      <div class="modal-title-text">PANEL ADMIN</div>
 
       <div class="admin-tab-nav">
         <button class="admin-tab-btn active" id="btnTab1" onclick="switchAdminTab('PERSETUJUAN')">Persetujuan Akses</button>
@@ -689,7 +417,7 @@
         <button class="admin-tab-btn" id="btnTab3" onclick="switchAdminTab('LOGS')">Log Akses</button>
       </div>
 
-      <!-- TAB 1: PERSETUJUAN AKSES / HAPUS -->
+      <!-- TAB 1: PERSETUJUAN AKSES -->
       <div id="viewTabPersetujuan" style="max-height: 300px; overflow-y: auto;">
         <table class="admin-table">
           <thead>
@@ -707,7 +435,7 @@
         </table>
       </div>
 
-      <!-- TAB 2: DAFTAR USER & UBAH ROLE -->
+      <!-- TAB 2: DAFTAR PENGGUNA -->
       <div id="viewTabUsers" style="display: none; max-height: 300px; overflow-y: auto;">
         <table class="admin-table">
           <thead>
@@ -744,13 +472,39 @@
   </div>
 
 
-  <!-- // ========================================== -->
-  <!-- // JAVASCRIPT LOGIC DENGAN SUPABASE SQL      -->
-  <!-- // ========================================== -->
+  <!-- MODAL UBAH PASSWORD -->
+  <div id="modalPassword" class="modal-overlay">
+    <div class="modal-card" style="max-width: 400px;">
+      <button class="btn-close-modal" onclick="closePasswordModal()">✕</button>
+      <div class="modal-title-text">UBAH PASSWORD</div>
+
+      <form onsubmit="prosesUbahPassword(event)">
+        <div class="form-group-modal">
+          <label>Password Lama</label>
+          <input type="password" id="inputOldPassword" required placeholder="Masukkan password lama">
+        </div>
+        <div class="form-group-modal">
+          <label>Password Baru</label>
+          <input type="password" id="inputNewPassword" required placeholder="Masukkan password baru">
+        </div>
+        <div class="form-group-modal">
+          <label>Konfirmasi Password Baru</label>
+          <input type="password" id="inputConfirmPassword" required placeholder="Ulangi password baru">
+        </div>
+
+        <button type="submit" class="btn-submit-floating" style="width: 100%; padding: 10px; font-size: 12px; margin-top: 10px;">
+          SIMPAN PASSWORD BARU
+        </button>
+      </form>
+    </div>
+  </div>
+
+
+  <!-- JAVASCRIPT LOGIC DENGAN SUPABASE SQL -->
   <script>
     Chart.register(ChartDataLabels);
 
-    // // 1. INISIALISASI KONEKSI DATABASE SUPABASE
+    // 1. KONEKSI DATABASE SUPABASE
     const SUPABASE_URL = "https://eaahqoaugbswnhqpcbul.supabase.co";
     const SUPABASE_KEY = "sb_publishable_5-DU9Coms_TkootEWNebIA_D1CrZaC9";
     const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -774,7 +528,19 @@
 
     const namaBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-    // // 2. PENGECEKAN SESI AKSES & ROLE USER
+    // 2. TOGGLE DROPDOWN PROFIL
+    function toggleProfileDropdown(event) {
+      event.stopPropagation();
+      const menu = document.getElementById("profileDropdownMenu");
+      menu.classList.toggle("show");
+    }
+
+    window.addEventListener("click", function() {
+      const menu = document.getElementById("profileDropdownMenu");
+      if (menu) menu.classList.remove("show");
+    });
+
+    // 3. PENGECEKAN SESI AKSES & ROLE USER
     function checkSession() {
       const isGranted = sessionStorage.getItem("simba_access");
       if (isGranted !== "granted" || !currentUserData.email) {
@@ -783,22 +549,28 @@
         return;
       }
 
-      // Tampilkan Nama & Role di Header
-      if (document.getElementById("userNamaDisplay")) document.getElementById("userNamaDisplay").innerText = currentUserData.nama;
-      if (document.getElementById("userRoleBadgeDisplay")) document.getElementById("userRoleBadgeDisplay").innerText = currentUserData.role;
+      const userRole = (currentUserData.role || "").toUpperCase();
 
-      // Munculkan Tombol Kelola Admin HANYA jika User Adalah ADMIN
-      if (currentUserData.role === "ADMIN") {
-        const btnAdmin = document.getElementById("btnKelolaAdmin");
-        if (btnAdmin) btnAdmin.style.display = "inline-flex";
+      // Tampilkan Data Pengguna di Header & Dropdown
+      if (document.getElementById("userNamaDisplay")) document.getElementById("userNamaDisplay").innerText = currentUserData.nama;
+      if (document.getElementById("dropdownNamaDisplay")) document.getElementById("dropdownNamaDisplay").innerText = currentUserData.nama;
+      if (document.getElementById("dropdownEmailDisplay")) document.getElementById("dropdownEmailDisplay").innerText = currentUserData.email;
+      if (document.getElementById("userRoleBadgeDisplay")) document.getElementById("userRoleBadgeDisplay").innerText = userRole;
+
+      // Filter Opsi Menu Dropdown Berdasarkan Role
+      if (userRole === "ADMIN") {
+        document.getElementById("menuAdminOption").style.display = "block";
+        document.getElementById("menuUserOption").style.display = "none";
+      } else {
+        document.getElementById("menuAdminOption").style.display = "none";
+        document.getElementById("menuUserOption").style.display = "block";
       }
     }
 
-    // // 3. PROSES LOGOUT USER DAN CATAT KE LOG DATABASE
+    // 4. PROSES LOGOUT USER
     async function prosesLogout() {
       if (confirm("Apakah Anda yakin ingin keluar dari sistem?")) {
         if (currentUserData.email) {
-          // Catat aktivitas LOGOUT ke Supabase SQL
           await db.from("access_logs").insert([
             { email: currentUserData.email, nama: currentUserData.nama, aktivitas: "LOGOUT" }
           ]);
@@ -809,24 +581,71 @@
       }
     }
 
-    // // 4. MINTA KELUAR / PERMOHONAN HAPUS AKUN (ATAS IZIN ADMIN)
+    // 5. PENGAJUAN HAPUS AKUN (OLEH USER NON-ADMIN)
     async function ajukanHapusAkun() {
-      if (confirm("Apakah Anda yakin ingin mengajukan pencabutan/penghapusan akun? Permohonan ini memerlukan persetujuan Admin.")) {
+      if (confirm("Apakah Anda yakin ingin mengajukan penghapusan akun Anda? Permohonan ini akan dikirim ke Admin untuk disetujui.")) {
         const { error } = await db
           .from("users")
           .update({ status: "pending_delete" })
           .eq("email", currentUserData.email);
 
         if (error) {
-          alert("❌ Gagal mengirim permohonan: " + error.message);
+          alert("❌ Gagal mengirim pengajuan: " + error.message);
         } else {
-          alert("✅ Permohonan pencabutan akun berhasil dikirim ke Admin!");
+          alert("✅ Pengajuan hapus akun telah dikirimkan ke Admin!");
           prosesLogout();
         }
       }
     }
 
-    // // 5. PANEL ADMIN MODAL & TAB LOGIC
+    // 6. MODAL UBAH PASSWORD
+    function openPasswordModal() {
+      document.getElementById("modalPassword").classList.add("show");
+    }
+
+    function closePasswordModal() {
+      document.getElementById("modalPassword").classList.remove("show");
+    }
+
+    async function prosesUbahPassword(e) {
+      e.preventDefault();
+      const oldPass = document.getElementById("inputOldPassword").value;
+      const newPass = document.getElementById("inputNewPassword").value;
+      const confirmPass = document.getElementById("inputConfirmPassword").value;
+
+      if (newPass !== confirmPass) {
+        alert("❌ Konfirmasi password baru tidak cocok!");
+        return;
+      }
+
+      // Cek password lama di database
+      const { data: user, error } = await db
+        .from("users")
+        .select("password")
+        .eq("email", currentUserData.email)
+        .single();
+
+      if (error || !user || user.password !== oldPass) {
+        alert("❌ Password lama Anda salah!");
+        return;
+      }
+
+      // Update password baru
+      const { error: updateErr } = await db
+        .from("users")
+        .update({ password: newPass })
+        .eq("email", currentUserData.email);
+
+      if (updateErr) {
+        alert("❌ Gagal mengubah password: " + updateErr.message);
+      } else {
+        alert("✅ Password berhasil diubah! Silakan login kembali.");
+        closePasswordModal();
+        prosesLogout();
+      }
+    }
+
+    // 7. PANEL ADMIN MODAL & TAB LOGIC
     function openAdminModal() {
       document.getElementById("modalAdmin").classList.add("show");
       switchAdminTab("PERSETUJUAN");
@@ -860,7 +679,7 @@
       }
     }
 
-    // // 6. AMBIL PERMOHONAN PENDAFTARAN / HAPUS (ADMIN)
+    // 8. AMBIL PERMOHONAN PENDAFTARAN / HAPUS (ADMIN)
     async function muatPersetujuanAkses() {
       const container = document.getElementById("tabelPersetujuanAkses");
       container.innerHTML = '<tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>';
@@ -887,8 +706,8 @@
             <td>${u.email}</td>
             <td><b>${u.role}</b></td>
             <td>
-              <button onclick="prosesPersetujuan(${u.id}, '${u.status}')" style="background:#00A859; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Setujui</button>
-              <button onclick="tolakPermohonan(${u.id})" style="background:#e53935; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Tolak</button>
+              <button class="btn-action-small btn-action-green" onclick="prosesPersetujuan(${u.id}, '${u.status}')">Setujui</button>
+              <button class="btn-action-small btn-action-red" onclick="tolakPermohonan(${u.id})">Tolak</button>
             </td>
           </tr>
         `;
@@ -896,26 +715,24 @@
       container.innerHTML = html;
     }
 
-    // // 7. EKSEKUSI APPROVE PERMOHONAN (ADMIN)
     async function prosesPersetujuan(userId, statusSaatIni) {
       if (statusSaatIni === "pending") {
         await db.from("users").update({ status: "approved" }).eq("id", userId);
         alert("✅ Pendaftaran akun berhasil disetujui!");
       } else if (statusSaatIni === "pending_delete") {
         await db.from("users").delete().eq("id", userId);
-        alert("🗑️ Permohonan keluar disetujui. Akun telah dihapus dari sistem!");
+        alert("🗑️ Permohonan hapus akun disetujui. Akun telah dihapus dari sistem!");
       }
       muatPersetujuanAkses();
     }
 
-    // // 8. TOLAK PERMOHONAN (ADMIN)
     async function tolakPermohonan(userId) {
       await db.from("users").update({ status: "rejected" }).eq("id", userId);
       alert("❌ Permohonan telah ditolak.");
       muatPersetujuanAkses();
     }
 
-    // // 9. AMBIL DAFTAR PENGGUNA TERDAFTAR & ANGKAT ROLE (ADMIN)
+    // 9. DAFTAR PENGGUNA (AKSI JADIKAN ADMIN & KELUARKAN USER)
     async function muatDaftarPengguna() {
       const container = document.getElementById("tabelDaftarPengguna");
       container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>';
@@ -929,20 +746,19 @@
 
       let html = "";
       data.forEach((u) => {
-        const isSelfOrPrimaryAdmin = u.email === "intanputriayu312@gmail.com";
+        const isSelfOrPrimaryAdmin = u.email === "intanputriayu312@gmail.com" || u.email === currentUserData.email;
+        const isAdminRole = (u.role || "").toUpperCase() === "ADMIN";
+
         html += `
           <tr>
             <td>${u.nama}</td>
             <td>${u.email}</td>
+            <td><b>${u.role}</b></td>
             <td>
-              <select onchange="ubahRolePengguna(${u.id}, this.value)" ${isSelfOrPrimaryAdmin ? "disabled" : ""}>
-                <option value="PKL" ${u.role === "PKL" ? "selected" : ""}>PKL</option>
-                <option value="PEGAWAI" ${u.role === "PEGAWAI" ? "selected" : ""}>PEGAWAI</option>
-                <option value="ADMIN" ${u.role === "ADMIN" ? "selected" : ""}>ADMIN</option>
-              </select>
-            </td>
-            <td>
-              ${!isSelfOrPrimaryAdmin ? `<button onclick="hapusPenggunaDirect(${u.id})" style="background:#e53935; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Hapus</button>` : '-'}
+              ${!isSelfOrPrimaryAdmin ? `
+                ${!isAdminRole ? `<button class="btn-action-small btn-action-blue" onclick="jadikanAdmin(${u.id})">Jadikan Admin</button>` : ''}
+                <button class="btn-action-small btn-action-red" onclick="keluarkanUser(${u.id})">Keluarkan User</button>
+              ` : '<em>Akun Anda</em>'}
             </td>
           </tr>
         `;
@@ -950,23 +766,29 @@
       container.innerHTML = html;
     }
 
-    // // 10. UBAH ROLE USER (MISAL ANGKAT DARI PKL JADI ADMIN)
-    async function ubahRolePengguna(userId, roleBaru) {
-      await db.from("users").update({ role: roleBaru }).eq("id", userId);
-      alert(`✅ Role pengguna berhasil diubah menjadi ${roleBaru}!`);
-      muatDaftarPengguna();
-    }
-
-    // // 11. HAPUS PENGGUNA DARI DAFTAR (ADMIN)
-    async function hapusPenggunaDirect(userId) {
-      if (confirm("Apakah Anda yakin ingin menghapus akun pengguna ini?")) {
-        await db.from("users").delete().eq("id", userId);
-        alert("🗑️ Akun berhasil dihapus!");
-        muatDaftarPengguna();
+    async function jadikanAdmin(userId) {
+      if (confirm("Apakah Anda yakin ingin mengubah role Pengguna ini menjadi ADMIN?")) {
+        const { error } = await db.from("users").update({ role: "ADMIN" }).eq("id", userId);
+        if (error) alert("❌ Gagal memperbarui role: " + error.message);
+        else {
+          alert("✅ Pengguna berhasil diubah menjadi ADMIN!");
+          muatDaftarPengguna();
+        }
       }
     }
 
-    // // 12. AMBIL RIWAYAT LOG AKSES (ADMIN)
+    async function keluarkanUser(userId) {
+      if (confirm("Apakah Anda yakin ingin mengeluarkan User ini dari sistem?")) {
+        const { error } = await db.from("users").delete().eq("id", userId);
+        if (error) alert("❌ Gagal mengeluarkan User: " + error.message);
+        else {
+          alert("🗑️ User berhasil dikeluarkan!");
+          muatDaftarPengguna();
+        }
+      }
+    }
+
+    // 10. AMBIL RIWAYAT LOG AKSES (ADMIN)
     async function muatLogAkses() {
       const container = document.getElementById("tabelLogAkses");
       container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>';
@@ -995,7 +817,7 @@
       container.innerHTML = html;
     }
 
-    // // 13. TIMER INAKTIVITAS AUTO LOGOUT (1 JAM)
+    // 11. TIMER INAKTIVITAS AUTO LOGOUT (1 JAM)
     const WAKTU_TUNGGU_1_JAM = 60 * 60 * 1000;
     let idleTimer = null;
 
@@ -1033,7 +855,7 @@
       window.addEventListener(evt, resetAktivitasUser, true);
     });
 
-    // // 14. SWITCH TAB DASHBOARD UTAMA
+    // 12. SWITCH TAB DASHBOARD UTAMA
     function switchFolder(folderKey, element) {
       currentTab = folderKey;
       
@@ -1303,7 +1125,7 @@
         });
     }
 
-    // // 15. JALANKAN PENGECEKAN KETIKA HALAMAN DIMUAT
+    // 13. JALANKAN PENGECEKAN KETIKA HALAMAN DIMUAT
     window.onload = function() {
       checkSession();
       cekInaktivitasSaatMuat();
